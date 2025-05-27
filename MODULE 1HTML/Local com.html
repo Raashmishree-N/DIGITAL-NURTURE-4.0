@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Local Community Event Portal</title>
+  <!-- Meta for responsiveness -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Internal Styles -->
+  <style>
+    /* General Layout */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav {
+      background: #0044cc;
+      color: white;
+      padding: 10px;
+    }
+
+    nav a {
+      color: white;
+      margin-right: 15px;
+      text-decoration: none;
+    }
+
+    #welcomeBanner {
+      background-color: #cce5ff;
+      padding: 15px;
+    }
+
+    .highlight {
+      background-color: yellow;
+      padding: 2px 5px;
+    }
+
+    .event-image {
+      border: 2px solid #999;
+      width: 100px;
+    }
+
+    table img {
+      width: 100px;
+    }
+
+    form {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f4f4f4;
+    }
+
+    #outputMessage {
+      font-weight: bold;
+      color: green;
+    }
+  </style>
+
+  <script>
+    // On page load
+    window.onload = function() {
+      alert("Page fully loaded");
+      console.log("Welcome to the Community Portal");
+
+      // Load saved event type
+      const savedEvent = localStorage.getItem("eventType");
+      if (savedEvent) {
+        document.getElementById("eventType").value = savedEvent;
+      }
+    };
+
+    function validatePhone() {
+      const phone = document.getElementById("phone").value;
+      if (!/^\d{10}$/.test(phone)) {
+        alert("Enter a 10-digit phone number.");
+      }
+    }
+
+    function showFee() {
+      const type = document.getElementById("eventType").value;
+      const fees = { music: "$10", tech: "$5", art: "$7" };
+      document.getElementById("feeDisplay").textContent = "Fee: " + (fees[type] || "$0");
+      localStorage.setItem("eventType", type);
+    }
+
+    function confirmSubmission() {
+      document.getElementById("outputMessage").textContent = "Form submitted successfully!";
+    }
+
+    function enlargeImage(img) {
+      img.style.width = img.style.width === "200px" ? "100px" : "200px";
+    }
+
+    function countChars() {
+      const count = document.getElementById("feedback").value.length;
+      document.getElementById("charCount").textContent = count + " characters";
+    }
+
+    function findLocation() {
+      if (!navigator.geolocation) {
+        alert("Geolocation not supported.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+         const coords = `Lat: ${pos.coords.latitude}, Long: ${pos.coords.longitude}`;
+
+          document.getElementById("locationResult").textContent = coords;
+        },
+        err => {
+          alert("Location access denied or failed.");
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000
+        }
+      );
+    }
+
+    function clearPrefs() {
+      localStorage.clear();
+      sessionStorage.clear();
+      alert("Preferences cleared");
+    }
+
+    window.onbeforeunload = function () {
+      return "Are you sure you want to leave this page?";
+    };
+
+    function showVideoReady() {
+      document.getElementById("videoStatus").textContent = "Video ready to play.";
+    }
+  </script>
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#events">Events</a>
+    <a href="#contact">Contact</a>
+    <a href="help.html" target="_blank">Help</a>
+  </nav>
+
+  <!-- Welcome Section -->
+  <section id="home">
+    <div id="welcomeBanner">
+      <h1>Welcome to the Local Community Portal</h1>
+      <p><span style="color: red; font-weight: bold;">Special Offer!</span> Register now and get a discount!</p>
+      <p class="highlight">Stay connected with your neighborhood.</p>
+    </div>
+  </section>
+
+  <!-- Image Gallery -->
+  <section id="gallery">
+    <h2>Past Community Events</h2>
+    <table>
+      <caption>Moments from Last Year</caption>
+      <tr>
+        <td><img src="event1.jpg" alt="Music Night" title="Music Night" class="event-image" ondblclick="enlargeImage(this)"></td>
+        <td><img src="event2.jpg" alt="Tech Workshop" title="Tech Workshop" class="event-image" ondblclick="enlargeImage(this)"></td>
+        <td><img src="event3.jpg" alt="Art Fest" title="Art Fest" class="event-image" ondblclick="enlargeImage(this)"></td>
+      </tr>
+      <tr>
+        <td><img src="event4.jpg" alt="Food Fair" title="Food Fair" class="event-image" ondblclick="enlargeImage(this)"></td>
+        <td><img src="event5.jpg" alt="Charity Run" title="Charity Run" class="event-image" ondblclick="enlargeImage(this)"></td>
+        <td><img src="event6.jpg" alt="Community Picnic" title="Community Picnic" class="event-image" ondblclick="enlargeImage(this)"></td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- Registration Form -->
+  <section id="events">
+    <h2>Event Registration</h2>
+    <form onsubmit="event.preventDefault(); confirmSubmission();">
+      <label>Name: <input type="text" name="name" placeholder="Enter full name" required autofocus></label><br><br>
+      <label>Email: <input type="email" name="email" placeholder="example@mail.com" required></label><br><br>
+      <label>Date: <input type="date" name="date" required></label><br><br>
+      <label>Event Type:
+        <select id="eventType" onchange="showFee()" required>
+          <option value="">Choose...</option>
+          <option value="music">Music</option>
+          <option value="tech">Technology</option>
+          <option value="art">Art</option>
+        </select>
+      </label>
+      <span id="feeDisplay"></span><br><br>
+      <label>Phone: <input type="text" id="phone" onblur="validatePhone()"></label><br><br>
+      <label>Message:<br>
+        <textarea id="feedback" rows="5" cols="30" onkeydown="countChars()"></textarea>
+      </label>
+      <div>Characters: <span id="charCount">0</span></div><br>
+      <button type="submit" id="submitBtn" onclick="confirmSubmission()">Register</button>
+      <output id="outputMessage"></output>
+    </form>
+  </section>
+
+  <!-- Video Invite -->
+  <section id="videoInvite">
+    <h2>Watch Our Event Promo</h2>
+    <video width="320" height="240" controls oncanplay="showVideoReady()">
+      <source src="promo.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <p id="videoStatus"></p>
+  </section>
+
+  <!-- Location and Preferences -->
+  <section id="contact">
+    <h2>Find Events Near You</h2>
+    <button onclick="findLocation()">Find Nearby Events</button>
+    <p id="locationResult"></p>
+    <button onclick="clearPrefs()">Clear Preferences</button>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Local Community Council. All rights reserved.</p>
+  </footer>
+</body>
+</html>
